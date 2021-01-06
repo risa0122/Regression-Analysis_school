@@ -1,0 +1,140 @@
+---
+title: "20170205_김종은"
+author: "20170205_김종은"
+date: "11/16/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+```{r}
+#5.3
+data(swiss);
+fit = lm(Fertility~., data=swiss)
+summary(fit)
+plot(fitted(fit), resid(fit), main="fitted value vs residual", lwd=2, col=4)
+plot(fitted(fit), rstandard(fit), main="fitted value vs standardized residual", lwd=2, col=4)
+abline(h=0, col=2, lwd=2)
+# 오차의 등분산성을 갖지 않음
+
+#b
+shapiro.test(fit$residuals)
+#회귀모형을 적합한 후 잔차가 정규성을 만족함
+
+#c
+h=hat(model.matrix(fit)); h
+plot(h, type="h", xlab="case index", main="leverage plot")
+# 19,45번 관측치가 가장 영향력이 크게 나타남(지렛대 점)
+
+#d
+library(car)
+outlierTest(fit)
+# unadjusted p-value가 0.018974	로 outlier 검정 결과 유의수준 0.05에서 Sierre 만이 유의한 이상점으로 판단됨
+
+
+#e
+influencePlot(fit, main="Influence Plot", sub="Circle size is proportial to Cook's Distance")
+
+#영향점 의심 : Porrentruy, La Vallee, Sierre, V. De Geneve, Rive Gauche		
+
+inflm.fit = influence.measures(fit)
+inflm.fit 
+which(apply(inflm.fit$is.inf, 1, any))
+summary(inflm.fit) 
+#영향점: Porrentruy La Vallee V, De Geneve 
+
+#f
+summary(fit)
+#F-statistic의 p-value가 5.594e-10로 0.05보다 작기에 설명변수들과 반응변수 간의 유의미하다(회귀분석모델 통계적 의미가 있다.)
+```
+
+```{r}
+#5.4
+y <- c(354,190,405,263,451,302,288,385,402,365,209,290,346,254,395,434,220,374,308,220,311,181,274,303,244)
+
+x1 <- c(84,73,65,70,76,69,63,72,79,75,27,89,65,57,59,69,60,79,75,82,59,67,85,55,63)
+
+x2 <- c(46,20,52,30,57,25,28,36,57,44,24,31,52,23,60,48,34,51,50,34,46,23,37,40,30)
+
+fit = lm(y~x1+x2)
+summary(fit)
+plot(fitted(fit), resid(fit), main="fitted value vs residual", lwd=2, col=4)
+plot(fitted(fit), rstandard(fit), main="fitted value vs standardized residual", lwd=2, col=4)
+abline(h=0, col=2, lwd=2)
+# 오차의 등분산성을 갖지 않음
+
+#b
+shapiro.test(fit$residuals)
+# 정규성검정 결과 잔차는 정규분포를 따름
+
+#c
+h=hat(model.matrix(fit)); h
+plot(h, type="h", xlab="case index", main="leverage plot")
+# 11번 관측치가 가장 영향력이 크게 나타남(지렛대 점)
+
+#d
+library(car)
+outlierTest(fit)
+# 이상점이 없다.
+
+#e
+influencePlot(fit, main="Influence Plot", sub="Circle size is proportial to Cook's Distance")
+
+#영향점 의심 : 6,8,11,15,16,20
+
+inflm.fit = influence.measures(fit)
+inflm.fit 
+which(apply(inflm.fit$is.inf, 1, any))
+summary(inflm.fit) 
+#영향점: 11,15
+
+#f
+summary(fit)
+#F-statistic의 p-value가 1.443e-06로 0.05보다 작기에 설명변수들과 반응변수 간의 유의미하다(회귀분석모델 통계적 의미가 있다.)
+```
+
+```{r}
+#5.5
+library(faraway)
+data(sat);
+str(sat)
+fit = lm(total~., data=sat)
+summary(fit)
+plot(fitted(fit), resid(fit), main="fitted value vs residual", lwd=2, col=4)
+plot(fitted(fit), rstandard(fit), main="fitted value vs standardized residual", lwd=2, col=4)
+abline(h=0, col=2, lwd=2)
+# 오차의 등분산성 가짐
+
+#b
+shapiro.test(rstandard(fit))
+#회귀모형을 적합한 후 잔차가 정규성을 만족함
+
+#c
+h=hat(model.matrix(fit)); h
+plot(h, type="h", xlab="case index", main="leverage plot")
+# 5,44번 관측치가 가장 영향력이 크게 나타남(지렛대 점)
+
+#d
+library(car)
+outlierTest(fit)
+# unadjusted p-value가 3.9521e-66	로 outlier 검정 결과 유의수준 0.05에서 Alabama	 만이 유의한 이상점으로 판단됨
+
+
+#e
+influencePlot(fit, main="Influence Plot", sub="Circle size is proportial to Cook's Distance")
+
+#영향점 의심 : Alabama, California, New Jersey, Tennessee, Utah
+
+inflm.fit = influence.measures(fit)
+inflm.fit 
+which(apply(inflm.fit$is.inf, 1, any))
+summary(inflm.fit) 
+#영향점: Alabama	, Alaska, California, Connecticut,Hawaii, North Dakota, Utah, Virginia 
+
+#f
+summary(fit)
+#F-statistic의 p-value가 2.2e-16이하로 0.05보다 작기에 설명변수들과 반응변수 간의 유의미하다(회귀분석모델 통계적 의미가 있다.)
+```

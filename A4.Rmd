@@ -1,0 +1,102 @@
+---
+title: "20170205김종은"
+author: "20170205_김종은"
+date: "12/12/2020"
+output: html_document
+---
+
+```{r}
+#7.1
+score <- c(159,164,154,157,156,150,155,161,163,162,154,159,167,155,159,159,160,154,160,151,166,161,162,169,160,161,166,163,159,155,155,157,151,162,164,159)
+
+fatheriq <- c(115,117,115,113,110,113,118,117,111,122,111,112,119,120,114,111,111,115,126,115,114,115,115,112,115,117,116,114,116,111,112,115,111,119,111,114)
+
+motheriq <- c(117,113,118,131,109,109,119,120,128,120,117,120,126,114,129,118,115,111,111,109,124,122,118,121,124,118,128,119,123,117,117,111,101,113,121,123)
+
+speak <- c(18,20,20,12,17,13,19,18,22,18,19,20,20,22,17,18,21,18,12,21,15,20,115,23,18,20,17,22,15,13,17,10,17,23,18,20)
+
+count <- c(26,37,32,24,34,28,24,32,28,27,32,33,35,21,27,29,32,32,35,29,39,30,33,36,35,31,36,36,24,29,25,31,29,28,36,30)
+
+read <- c(1.9,2.5,2.2,1.7,2.2,1.9,1.8,2.3,2.1,2.1,2.2,2.3,2.2,1.7,1.8,2,2.3,2.2,2.2,2,2.4,2.1,2.3,2.3,2.3,2.3,2.4,2.4,1.8,2.1,2,2.2,2.1,2.1,2.3,2.2)
+
+edutv <- c(3,1.75,2.75,2.75,2.25,1.25,2,2.25,1,2.25,1.75,2,0.75,2.5,1.5,1.75,1.75,2,2.75,2,2,2,2.25,2,2,2,1.25,2.25,1.5,1.75,2.75,1.75,3,1.25,1,1.75)
+
+cartoons <- c(2,3.25,2.5,2.25,2.5,3.75,3,2.5,4,2.75,3.75,2.75,4,2.5,3.75,3.25,3.25,3,1.75,2.75,2.75,3.5,2.75,2.75,3.5,3,3.75,2.75,3.5,3.5,2.25,3.5,2.25,3.5,4.5,3.25)
+
+```
+
+```{r}
+full = lm(score ~ fatheriq+motheriq+speak+count+read+edutv+cartoons) 
+summary(full)
+#통계적 유의수준 0.05에서fatheriq, motheriq, read, edutv, cartoons만 유의함
+fit = lm(score ~ fatheriq+motheriq+read+edutv+cartoons) 
+summary(fit)
+```
+
+$$\hat{Y} = 79.04678 + 0.23736fatheriq + 0.41211motheriq + 11.90132read -4.88814edutv -3.82023cartoons$$
+
+```{r}
+#8.1
+x <- c(21,20,19,18,17,16,15)
+y <- c(17.26,17.07,16.37,16.40,16.13,16.17,15.98)
+rootw <- c(1.988,1.938,1.896,2.037,1.654,1.594,1.764)
+
+#a
+plot(x,y) 
+
+#b
+wreg = lm(y ~ x, weight = rootw)
+summary(wreg)
+```
+
+$$\hat{Y}= 12.65437+0.21265x$$
+
+```{r}
+#c
+plot(y ~ x, lwd=2, col=1, frame.plot=F, main='WLS 1차 적합')+lines(x, fitted(wreg), lwd=2, col=2)
+
+#d
+plot(rstandard(wreg) ~ fitted(wreg), lwd=2, frame.plot=F, main='standardized residual') + abline(h=0, lwd=2, lty=2, col=2)
+```
+
+```{r}
+#9.1
+
+style <- c("Romanesque","Romanesque","Romanesque","Romanesque","Romanesque","Romanesque","Romanesque","Romanesque","Romanesque","Gothic","Gothic","Gothic","Gothic","Gothic","Gothic","Gothic","Gothic","Gothic","Gothic","Gothic","Gothic","Gothic","Gothic","Gothic","Gothic")
+
+cath <-c("Durham","Camterbury","Gloucester","Hereford","Norwich","Peterborough","St.Albans","Winchester","Ely","York","Bath","Bristol","Chichester","Exeter","Gloucester","Lichfield","Lincooln","Norwich","Ripon","Southwark","Wells","St.Asaph","Winchester","OldSt.Paul","Salisbury")
+
+height <- c(75,80,68,64,83,80,70,76,74,100,75,52,62,68,86,57,82,72,88,55,67,45,103,103,84)
+
+length <- c(502,522,425,344,407,451,551,530,547,519,225,300,418,409,425,370,506,407,295,273,415,182,530,611,473)
+
+```
+
+```{r}
+#a
+df <- data.frame(style,cath,height,length)
+library(ggplot2)
+ggplot(data=df,aes(x=height, y=length, shape=style)) + geom_point(size=3) + ggtitle("Scatter Plot by Style, differenct Shapes")
+
+#b
+df$d_style =as.numeric(df$style)-1  #가변수 전환
+ra = lm(height ~ d_style+length,data=df) 
+summary(ra)
+
+
+#c
+with(plot(height ~ length, pch=d_style, lwd=2, col=c(2,4), frame.plot=F, sub="Romanesque or Gothic"),
+data=df)+lines(length, fitted(ra), lwd=2, col=2)
+
+#d
+ra2 = lm(height ~ length) 
+summary(ra2)
+
+#가변수 style이 포함된 회귀모형의 상관계수(R^2)는 0.474이고, 가변수 style이 미포함된 회귀모형의 상관계수(R^2)는 0.4084이므로 가변수가 포함된 모형이 더 유의미하다. 
+
+#e
+with(plot(height ~ length, lwd=2, col=c(2,4), frame.plot=F),
+data=df)+lines(length, fitted(ra2), lwd=2, col=2)
+```
+
+
